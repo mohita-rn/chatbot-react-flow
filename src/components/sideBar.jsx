@@ -6,11 +6,13 @@ import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 export default function Sidebar({ nodeName, setNodeName, selectedNode, setSelectedElements, setSelectedNode}) {
 
+  //handle drag start
     const onDragStart = (event, nodeType) => {
         event.dataTransfer.setData("application/reactflow", nodeType);
         event.dataTransfer.effectAllowed = "move";
       };
 
+      //handle input change
     const handleInputChange = (event) => {
         setNodeName(event.target.value);
     };
@@ -18,6 +20,7 @@ export default function Sidebar({ nodeName, setNodeName, selectedNode, setSelect
 
   return (
     <aside className="sideBar">
+      {/* check for selected node, if present show settings panel else show new node panel */}
       {selectedNode ? (
         //settings panel
         <div >

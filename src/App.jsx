@@ -4,7 +4,6 @@ import 'reactflow/dist/style.css';
 import Sidebar from './components/sideBar.jsx';
 import CustomNode from './components/customNode.jsx';
 import './App.css';
-import { toast, ToastContainer } from 'react-toastify';
 
 // Key for local storage
 const flowKey = "flow-key";
@@ -24,6 +23,7 @@ const getId = () => `node_${id++}`;
  
  function App() {
 
+  //setting up references, states and hooks
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -32,10 +32,12 @@ const getId = () => `node_${id++}`;
   const [nodeName, setNodeName] = useState("");
   const { setViewport } = useReactFlow();
 
+  //memoizing node types
   const nodeTypes = useMemo(() => ({
       textnode: CustomNode,
     }), []);
 
+    //setting selected element to the first node so that it can be passed to sidebar component 
     useEffect(() => {
       if (selectedElements.length > 0) {
         setNodes((nodes) =>
@@ -54,6 +56,7 @@ const getId = () => `node_${id++}`;
       }
     }, [nodeName, selectedElements, setNodes]);
 
+    //setting and adding edges when connecting nodes
     const onConnect = useCallback(
       (params) => {
         console.log("New Edge -- ", params);
@@ -62,6 +65,7 @@ const getId = () => `node_${id++}`;
       [setEdges]
     );
 
+    //setting up drag and drop functionality
     const onDragOver = useCallback((event) => {
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
@@ -89,12 +93,13 @@ const getId = () => `node_${id++}`;
           data: { label: `${type}` },
         };
   
-        console.log("Node created: ", newNode);
+        console.log("New node- ", newNode);
         setNodes((nds) => nds.concat(newNode));
       },
       [reactFlowInstance]
     );
 
+    //setting up node click functionality
     const onNodeClick = useCallback((event, node) => {
       setSelectedElements([node]);
       setNodeName(node.data.label);
@@ -106,6 +111,7 @@ const getId = () => `node_${id++}`;
       );
     }, []);
 
+    //checking for empty target handles
     const checkEmptyTargetHandles = () => {
       let emptyTargetHandles = 0;
       edges.forEach((edge) => {
@@ -116,6 +122,7 @@ const getId = () => `node_${id++}`;
       return emptyTargetHandles;
     };
 
+    //checking for unconnected nodes
     const isNodeUnconnected = useCallback(() => {
       let unconnectedNodes = nodes.filter(
         (node) =>
@@ -127,16 +134,17 @@ const getId = () => `node_${id++}`;
       return unconnectedNodes.length > 0;
     }, [nodes, edges]);
 
+    //saving flow to local storage
     const onSave = useCallback(() => {
       if (reactFlowInstance) {
         const emptyTargetHandles = checkEmptyTargetHandles();
   
         if (nodes.length > 1 && (emptyTargetHandles > 1 || isNodeUnconnected())) {
-          toast.error('Cannot save Flow');
+          alert('Cannot save Flow');
         } else {
           const flow = reactFlowInstance.toObject();
           localStorage.setItem(flowKey, JSON.stringify(flow));
-          toast.success("Flow saved successfully!"); // Provide feedback when save is successful
+          alert("Flow saved successfully!"); // Provide feedback when save is successful
         }
       }
     }, [reactFlowInstance, nodes, isNodeUnconnected]);
@@ -147,8 +155,7 @@ const getId = () => `node_${id++}`;
 
   return (
     <div className='app'>
-      <ToastContainer position="top" autoClose={1000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover style={{ maxWidth: "320px" }}/>
-      <div className="flow" ref={reactFlowWrapper}>
+     <div className="flow" ref={reactFlowWrapper}>
       
         <ReactFlow
           nodes={nodes}

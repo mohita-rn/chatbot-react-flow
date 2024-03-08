@@ -21,7 +21,7 @@ function CustomNode({ data, selected }) {
             {data.label ?? "Text Node"}
           </div>
         </div>
-
+       {/* adding left and right handles for adding edges */}
       <Handle
         id="a"
         type="target"
